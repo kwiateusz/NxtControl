@@ -3,9 +3,11 @@
 *   PrimeSense NiTE 2.0 - User Viewer Sample                                   *
 *   Copyright (C) 2012 PrimeSense Ltd.										   *
 *																			   *
-*   Integration with Mindstorm - Micha³ 'kwiateusz' kwiatek					   *
+*   Integration with Mindstorm - Micha³ 'kwiateusz' Kwiatek					   *
 *	Copyright (C) 2014 Ko³o naukowe robotyki								   *
 *																			   *
+*   Control modification/testing - Adam Augustniak                             *
+*	Copyright (C) 2014 Ko³o naukowe robotyki								   *
 *                                                                              *
 *******************************************************************************/
 
@@ -541,32 +543,52 @@ void SampleViewer::Display()
 				joints.insert(pair<string, const nite::SkeletonJoint>("right_shoulder", user.getSkeleton().getJoint(nite::JOINT_RIGHT_SHOULDER)));
 				joints.insert(pair<string, const nite::SkeletonJoint>("left_hand", user.getSkeleton().getJoint(nite::JOINT_LEFT_HAND)));
 				joints.insert(pair<string, const nite::SkeletonJoint>("left_shoulder", user.getSkeleton().getJoint(nite::JOINT_LEFT_SHOULDER)));
-					
-
+				joints.insert(pair<string, const nite::SkeletonJoint>("right_elbow", user.getSkeleton().getJoint(nite::JOINT_RIGHT_ELBOW)));
+				joints.insert(pair<string, const nite::SkeletonJoint>("left_elbow", user.getSkeleton().getJoint(nite::JOINT_LEFT_ELBOW)));
+ 
 				if (joints["right_hand"].getPositionConfidence() > .5){
 					positions["right_hand"]['x'] = joints["right_hand"].getPosition().x;
 					positions["right_hand"]['y'] = joints["right_hand"].getPosition().y;
+					positions["right_hand"]['z'] = joints["right_hand"].getPosition().z;
 				}
 
 				if (joints["right_shoulder"].getPositionConfidence() > .5){
 					positions["right_shoulder"]['x'] = joints["right_shoulder"].getPosition().x;
 					positions["right_shoulder"]['y'] = joints["right_shoulder"].getPosition().y;
+					positions["right_shoulder"]['z'] = joints["right_shoulder"].getPosition().z;
 				}
 
 				if (joints["left_hand"].getPositionConfidence() > .5){
 					positions["left_hand"]['x'] = joints["left_hand"].getPosition().x;
 					positions["left_hand"]['y'] = joints["left_hand"].getPosition().y;
+					positions["left_hand"]['z'] = joints["left_hand"].getPosition().z;
 				}
 
 				if (joints["left_shoulder"].getPositionConfidence() > .5){
 					positions["left_shoulder"]['x'] = joints["left_shoulder"].getPosition().x;
 					positions["left_shoulder"]['y'] = joints["left_shoulder"].getPosition().y;
+					positions["left_shoulder"]['z'] = joints["left_shoulder"].getPosition().z;
+				}
+
+				if (joints["right_elbow"].getPositionConfidence() > .5)
+				{
+					positions["right_elbow"]['x'] = joints["right_elbow"].getPosition().x;
+					positions["right_elbow"]['y'] = joints["right_elbow"].getPosition().y;
+					positions["right_elbow"]['z'] = joints["right_elbow"].getPosition().z;
+				}
+
+				if (joints["left_elbow"].getPositionConfidence() > .5)
+				{
+					positions["left_elbow"]['x'] = joints["left_elbow"].getPosition().x;
+					positions["left_elbow"]['y'] = joints["left_elbow"].getPosition().y;
+					positions["left_elbow"]['z'] = joints["left_elbow"].getPosition().z;
 				}
 					
 				float precision = 70;
 				int speed = 40;
 
-				if(positions["right_hand"]['y'] > positions["right_shoulder"]['y']){
+
+			/*	if(positions["right_hand"]['y'] > positions["right_shoulder"]['y']){
 
 					if(positions["right_hand"]['x'] > (positions["right_shoulder"]['x'] + precision)) {
 
@@ -578,9 +600,9 @@ void SampleViewer::Display()
 						NXT::Motor::SetForward(&comm, OUT_B, speed);
 						NXT::Motor::SetReverse(&comm, OUT_C, speed);
 
-							
 
-					}  else {
+
+					} else {
 
 						NXT::Motor::SetForward(&comm, OUT_B, speed);
 						NXT::Motor::SetForward(&comm, OUT_C, speed);
@@ -591,12 +613,48 @@ void SampleViewer::Display()
 				} else if(positions["left_hand"]['y'] > positions["left_shoulder"]['y']){
 
 					NXT::Motor::SetReverse(&comm, OUT_B, speed);
-					NXT::Motor::SetReverse(&comm, OUT_C, speed); 
+					NXT::Motor::SetReverse(&comm, OUT_C, speed);
 
 				} else {
 					NXT::Motor::Stop(&comm, OUT_B, true);
 					NXT::Motor::Stop(&comm, OUT_C, true);
 				}
+
+
+			}
+		}*/
+
+
+				if(positions["left_hand"]['z'] > positions["right_hand"]['z'] + 100 && positions["left_elbow"]['z'] > positions["right_elbow"]['z'] + 50)
+				{
+					NXT::Motor::SetForward(&comm, OUT_B, speed);
+					NXT::Motor::SetForward(&comm, OUT_C, speed);
+				}
+//
+				else if(positions["right_hand"]['z'] > positions["left_hand"]['z'] + 100 && positions["right_elbow"]['z'] > positions["left_elbow"]['z'] + 50)
+				{
+					NXT::Motor::SetReverse(&comm, OUT_B, speed);
+					NXT::Motor::SetReverse(&comm, OUT_C, speed);
+				}
+
+				else if(positions["right_hand"]['x'] > positions["right_shoulder"]['x']+precision && positions["right_elbow"]['x']>positions["right_shoulder"]['x']+precision)
+				{
+					NXT::Motor::SetReverse(&comm, OUT_B, speed);
+					NXT::Motor::SetForward(&comm, OUT_C, speed);
+				}  
+								
+				else if(positions["left_hand"]['x'] < positions["left_shoulder"]['x']+precision && positions["left_elbow"]['x']+precision<positions["left_shoulder"]['x'])
+				{
+					NXT::Motor::SetForward(&comm, OUT_B, speed);
+					NXT::Motor::SetReverse(&comm, OUT_C, speed); 
+				} 
+
+				else 
+				{
+					NXT::Motor::Stop(&comm, OUT_B, true);
+					NXT::Motor::Stop(&comm, OUT_C, true);
+				}
+				
 
 
 			}
